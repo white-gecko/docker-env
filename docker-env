@@ -3,7 +3,7 @@
 list ()
 {
     echo "local"
-    echo "prod1"
+    echo "remote1"
 }
 env_remote1 ()
 {
