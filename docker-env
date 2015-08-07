@@ -1,0 +1,27 @@
+#!/bin/bash
+
+list ()
+{
+    echo "local"
+    echo "prod1"
+}
+env_remote1 ()
+{
+    export DOCKER_HOST="remote1.org:2375"
+    export DOCKER_TLS_VERIFY="1"
+    export DOCKER_CERT_PATH="$HOME/mydockerkeys/remote1/"
+}
+env_local ()
+{
+    export DOCKER_HOST="unix:///var/run/docker.sock"
+    export DOCKER_TLS_VERIFY=""
+    export DOCKER_CERT_PATH=""
+}
+
+env_${DOCKER_ENV}
+if [ $1 == "list-env" ]
+then
+    list
+else
+    /usr/bin/docker $@
+fi
