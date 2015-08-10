@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# AUTHOR Natanael Arndt <arndtn@gmail.com>
+# LICENSE GPLv3 or any later
+# URL https://github.com/white-gecko/docker-env
+#
+
+docker="/usr/bin/docker"
+functionPrefix="dockerenv_"
+
+## BEGIN OF DOCKER ENV DEFINITIONS
+
+dockerenv_remote1 ()
+{
+    export DOCKER_HOST="remote.docker.host.url:1234"
+    export DOCKER_TLS_VERIFY="1"
+    export DOCKER_CERT_PATH="$HOME/dockerkeys/host1/"
+}
+dockerenv_local ()
+{
+    export DOCKER_HOST="unix:///var/run/docker.sock"
+    export DOCKER_TLS_VERIFY=""
+    export DOCKER_CERT_PATH=""
+}
+
+## END OF DOCKER ENV DEFINITIONS
+
+## PLEASE DO NOT CHANGE ANYTHING BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
+
+prepare_env_list ()
+{
+    env_list=""
+    for env in `compgen -A function | grep $functionPrefix`
+    do
+        env_list="$env_list ${env#*_}"
+    done
+}
+list_env ()
+{
+    #echo `declare -F | grep 'env_'`
+    prepare_env_list
+    for env in $env_list
+    do
+        selected=" "
+        if [ $env == $DOCKER_ENV ]
+        then
+            selected="*"
+        fi
+        echo "$selected $env"
+    done
+}
+select_env ()
+{
+    prepare_env_list
+    # you could also use zenity if you like to have some graphical interaction
+    #select=`zenity --list --column=environment $env_list`
+    select select in $env_list
+    do
+        echo -n "export DOCKER_ENV=$select"
+        break
+    done
+}
+
+if [ "$1" == "list-env" ]
+then
+    list_env
+elif [ "$1" == "select-env" ]
+then
+    select_env
+else
+    ${functionPrefix}${DOCKER_ENV}
+    $docker $@
+fi
