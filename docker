@@ -69,5 +69,5 @@ then
     select_env
 else
     ${functionPrefix}${DOCKER_ENV}
-    $docker $@
+    $docker "$@"
 fi
